@@ -156,3 +156,75 @@ button,
     transform: scale(1);
   }
 }
+
+/* ========== MOBILE RESPONSIVE STYLES ========== */
+
+/* Prevent zoom on input focus (iOS) */
+@media screen and (max-width: 768px) {
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+/* Safe area insets for notched devices (iPhone X+) */
+@supports (padding: max(0px)) {
+  .safe-area-top {
+    padding-top: max(0.5rem, env(safe-area-inset-top));
+  }
+  .safe-area-bottom {
+    padding-bottom: max(0.5rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* Mobile-first touch feedback */
+@media (hover: none) and (pointer: coarse) {
+  button:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+}
+
+/* Prevent text selection on buttons (mobile) */
+button {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* Smooth momentum scrolling on iOS */
+.chat-container {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Full height on mobile browsers */
+html {
+  height: -webkit-fill-available;
+}
+
+body {
+  min-height: 100vh;
+  min-height: -webkit-fill-available;
+}
+
+/* Mobile landscape mode optimization */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .avatar-section {
+    transform: scale(0.7);
+  }
+}
+
+/* Tablet optimization */
+@media screen and (min-width: 768px) and (max-width: 1024px) {
+  .chat-container {
+    max-height: 60vh;
+  }
+}
+
+/* Desktop optimization */
+@media screen and (min-width: 1024px) {
+  .chat-container {
+    max-height: 70vh;
+  }
+}

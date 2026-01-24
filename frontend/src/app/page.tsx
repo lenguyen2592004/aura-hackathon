@@ -9,6 +9,7 @@ import StatusBar from "@/components/StatusBar";
 import SettingsPanel from "@/components/SettingsPanel";
 import WelcomeModal from "@/components/WelcomeModal";
 import { Message, AuraState, Settings } from "@/types";
+import { getTTS, TextToSpeech } from "@/lib/tts";
 
 export default function Home() {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -26,11 +27,51 @@ export default function Home() {
     theme: "light",
   });
 
+  const ttsRef = useRef<TextToSpeech | null>(null);
+
   // Simulate connection status
   useEffect(() => {
     const timer = setTimeout(() => setIsConnected(true), 1500);
     return () => clearTimeout(timer);
   }, []);
+
+  // Initialize TTS
+  useEffect(() => {
+    ttsRef.current = getTTS();
+
+    // Cleanup on unmount
+    return () => {
+      if (ttsRef.current) {
+        ttsRef.current.stop();
+      }
+    };
+  }, []);
+
+  // Helper function to speak Aura's message
+  const speakMessage = useCallback(
+    async (text: string) => {
+      if (!ttsRef.current) return;
+
+      setIsSpeaking(true);
+      setAuraState("speaking");
+
+      try {
+        const rate = TextToSpeech.getRateFromSetting(settings.voiceSpeed);
+        await ttsRef.current.speak(text, {
+          rate,
+          onEnd: () => {
+            setIsSpeaking(false);
+            setAuraState("idle");
+          },
+        });
+      } catch (error) {
+        console.error("[App] TTS error:", error);
+        setIsSpeaking(false);
+        setAuraState("idle");
+      }
+    },
+    [settings.voiceSpeed],
+  );
 
   // Add welcome message from Aura
   useEffect(() => {
@@ -42,14 +83,13 @@ export default function Home() {
         timestamp: new Date(),
       };
       setMessages([welcomeMessage]);
-      setIsSpeaking(true);
-      setAuraState("speaking");
+
+      // Speak welcome message
       setTimeout(() => {
-        setIsSpeaking(false);
-        setAuraState("idle");
-      }, 4000);
+        speakMessage(welcomeMessage.text);
+      }, 500);
     }
-  }, [showWelcome, settings.userName]);
+  }, [showWelcome, settings.userName, speakMessage]);
 
   const handleSendMessage = useCallback(
     (text: string) => {
@@ -83,16 +123,14 @@ export default function Home() {
           timestamp: new Date(),
         };
         setMessages((prev) => [...prev, auraMessage]);
-        setAuraState("speaking");
-        setIsSpeaking(true);
 
+        // Speak the response
         setTimeout(() => {
-          setIsSpeaking(false);
-          setAuraState("idle");
-        }, 3000);
+          speakMessage(randomResponse);
+        }, 300);
       }, 1500);
     },
-    [settings.userName],
+    [settings.userName, speakMessage],
   );
 
   const handleVoiceStart = useCallback(() => {
@@ -119,6 +157,11 @@ export default function Home() {
   }, []);
 
   const handleSOSClick = useCallback(() => {
+    // Stop any ongoing speech
+    if (ttsRef.current) {
+      ttsRef.current.stop();
+    }
+
     const sosMessage: Message = {
       id: Date.now().toString(),
       text: "🆘 YÊU CẦU HỖ TRỢ KHẨN CẤP",
@@ -128,22 +171,21 @@ export default function Home() {
     setMessages((prev) => [...prev, sosMessage]);
 
     setTimeout(() => {
+      const responseText = `${settings.userName} ơi, tôi đã nhận được yêu cầu hỗ trợ của bạn. Tôi đang liên hệ với người thân của bạn ngay. Bạn có thể cho tôi biết bạn cần giúp đỡ gì không?`;
       const auraResponse: Message = {
         id: (Date.now() + 1).toString(),
-        text: `${settings.userName} ơi, tôi đã nhận được yêu cầu hỗ trợ của bạn. Tôi đang liên hệ với người thân của bạn ngay. Bạn có thể cho tôi biết bạn cần giúp đỡ gì không?`,
+        text: responseText,
         sender: "aura",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, auraResponse]);
-      setAuraState("speaking");
-      setIsSpeaking(true);
 
+      // Speak SOS response
       setTimeout(() => {
-        setIsSpeaking(false);
-        setAuraState("idle");
-      }, 4000);
+        speakMessage(responseText);
+      }, 300);
     }, 500);
-  }, [settings.userName]);
+  }, [settings.userName, speakMessage]);
 
   const handleCloseWelcome = useCallback((name: string) => {
     setSettings((prev) => ({ ...prev, userName: name }));
@@ -151,57 +193,96 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100 flex flex-col">
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex flex-col">
       {/* Welcome Modal */}
       {showWelcome && <WelcomeModal onClose={handleCloseWelcome} />}
 
-      {/* Status Bar */}
+      {/* Header/Navbar */}
       <StatusBar
         isConnected={isConnected}
         onSettingsClick={() => setShowSettings(true)}
       />
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col lg:flex-row gap-4 p-4 max-w-7xl mx-auto w-full">
-        {/* Avatar Section */}
-        <div className="lg:w-1/3 flex flex-col items-center justify-center">
-          <Avatar
-            state={auraState}
-            isSpeaking={isSpeaking}
-            isListening={isListening}
-          />
-
-          {/* Voice Button */}
-          <div className="mt-6">
-            <VoiceButton
-              onVoiceStart={handleVoiceStart}
-              onVoiceEnd={handleVoiceEnd}
-              onTranscript={handleVoiceTranscript}
-              isListening={isListening}
-              disabled={!isConnected}
-            />
-          </div>
-
-          {/* Current Transcript Display */}
-          {currentTranscript && (
-            <div className="mt-4 p-4 bg-white rounded-2xl shadow-lg max-w-sm">
-              <p className="text-elderly-base text-slate-600 italic">
-                "{currentTranscript}..."
-              </p>
-            </div>
-          )}
+      {/* Hero Section - giới thiệu ngắn */}
+      <section className="bg-gradient-to-r from-blue-600 to-purple-600 text-white py-6 px-4">
+        <div className="max-w-7xl mx-auto text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-2">
+            Chào mừng {settings.userName} đến với Aura! 👋
+          </h2>
+          <p className="text-lg text-blue-100">
+            Hãy bắt đầu trò chuyện - Aura luôn sẵn sàng lắng nghe bạn
+          </p>
         </div>
+      </section>
 
-        {/* Chat Section */}
-        <div className="lg:w-2/3 flex flex-col">
-          <ChatInterface
-            messages={messages}
-            onSendMessage={handleSendMessage}
-            isTyping={auraState === "thinking"}
-            userName={settings.userName}
-          />
+      {/* Main Content */}
+      <div className="flex-1 py-8 px-4">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Avatar Section - Card */}
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-3xl shadow-xl p-6 sticky top-32">
+                <h3 className="text-xl font-bold text-slate-700 mb-4 text-center">
+                  Trợ lý ảo của bạn
+                </h3>
+
+                <div className="flex flex-col items-center">
+                  <Avatar
+                    state={auraState}
+                    isSpeaking={isSpeaking}
+                    isListening={isListening}
+                  />
+
+                  {/* Voice Button */}
+                  <div className="mt-6">
+                    <VoiceButton
+                      onVoiceStart={handleVoiceStart}
+                      onVoiceEnd={handleVoiceEnd}
+                      onTranscript={handleVoiceTranscript}
+                      isListening={isListening}
+                      disabled={!isConnected}
+                    />
+                  </div>
+
+                  {/* Current Transcript Display */}
+                  {currentTranscript && (
+                    <div className="mt-4 p-4 bg-blue-50 rounded-2xl w-full">
+                      <p className="text-base text-slate-600 italic text-center">
+                        "{currentTranscript}..."
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Chat Section */}
+            <div className="lg:col-span-2">
+              <ChatInterface
+                messages={messages}
+                onSendMessage={handleSendMessage}
+                isTyping={auraState === "thinking"}
+                userName={settings.userName}
+              />
+            </div>
+          </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="bg-slate-800 text-white py-6 px-4">
+        <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">🌟</span>
+            <span className="font-bold text-lg">Aura</span>
+            <span className="text-slate-400">|</span>
+            <span className="text-slate-300">Người bạn AI đồng hành</span>
+          </div>
+          <div className="text-slate-400 text-sm">
+            © 2026 Aura Project - Designed for Elderly Care
+          </div>
+        </div>
+      </footer>
 
       {/* SOS Button - Always visible */}
       <SOSButton onClick={handleSOSClick} />

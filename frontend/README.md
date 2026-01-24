@@ -6,6 +6,22 @@
 
 ![Aura Preview](./docs/preview.png)
 
+## 📱 Responsive Web App - Chạy trên mọi thiết bị
+
+| Platform                 | Hỗ trợ | Cách truy cập                                   |
+| ------------------------ | ------ | ----------------------------------------------- |
+| 💻 **Windows/Mac/Linux** | ✅     | Mở browser → vào URL                            |
+| 📱 **Android**           | ✅     | Chrome → vào URL → "Add to Home Screen"         |
+| 🍎 **iOS (iPhone/iPad)** | ✅     | Safari → vào URL → Share → "Add to Home Screen" |
+
+### Tính năng Cross-Platform:
+
+- ✅ **Responsive Design** - Tự động thích ứng PC, tablet, mobile
+- ✅ **Touch-friendly** - Nút lớn 48px+, dễ chạm trên điện thoại
+- ✅ **PWA Support** - Có thể thêm vào Home Screen như app
+- ✅ **Safe Area Support** - Hỗ trợ iPhone notch
+- ✅ **Voice Input** - Web Speech API hoạt động trên Chrome mobile
+
 ## ✨ Tính năng chính
 
 ### 🎭 Avatar Tương tác
