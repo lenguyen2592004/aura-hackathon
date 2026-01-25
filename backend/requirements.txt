@@ -5,3 +5,8 @@ python-dotenv
 pydantic
 pytest
 httpx
+edge-tts
+SpeechRecognition
+pydub
+groq
+python-multipart

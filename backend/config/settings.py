@@ -9,5 +9,6 @@ class Settings:
     HOST: str = os.getenv("HOST", "0.0.0.0")
     PORT: int = int(os.getenv("PORT", 8000))
     ENV: str = os.getenv("ENV", "dev")
+    GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
 
 settings = Settings()

@@ -68,3 +68,59 @@ async def websocket_endpoint(websocket: WebSocket):
         print(f"Error: {e}")
         # Try to close if possible, or just ignore
         pass
+
+@router.post("/chat", response_model=dict)
+async def chat_text(payload: dict):
+    """
+    Test endpoint for text-to-text chat.
+    Input: {"text": "Hello"}
+    Output: {"response": "Hi there"}
+    """
+    user_text = payload.get("text", "")
+    if not user_text:
+        return {"response": "Please provide text."}
+    
+    response_text = await llm_service.process(user_text)
+    return {"response": response_text}
+
+from fastapi import File, UploadFile
+from fastapi.responses import StreamingResponse
+import io
+import base64
+
+@router.post("/talk")
+async def talk_to_aura(file: UploadFile = File(...)):
+    """
+    Test full voice pipeline (One-shot).
+    Input: Audio file (WAV/MP3).
+    Output: Audio file (Response voice).
+    
+    1. STT: Converts uploaded audio to text.
+    2. LLM: Gets response from AI.
+    3. TTS: Converts response to audio.
+    """
+    # Read audio file
+    audio_bytes = await file.read()
+    
+    # 1. STT
+    user_text = await stt_service.transcribe(audio_bytes)
+    print(f"STT Transcript: {user_text}")
+    
+    if not user_text:
+        return {"error": "Could not understand audio"}
+
+    # 2. LLM
+    ai_response_text = await llm_service.process(user_text)
+    print(f"LLM Response: {ai_response_text}")
+
+    # 3. TTS
+    audio_output = await tts_service.speak(ai_response_text)
+    
+    # Encode audio to base64 to return in JSON
+    audio_base64 = base64.b64encode(audio_output).decode('utf-8')
+    
+    return {
+        "user_text": user_text,
+        "ai_response": ai_response_text,
+        "audio_base64": audio_base64
+    }
