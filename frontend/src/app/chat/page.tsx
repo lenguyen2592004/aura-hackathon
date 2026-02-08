@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { Suspense, useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
@@ -26,8 +26,7 @@ interface Message {
   timestamp: Date;
 }
 
-export default function ChatPage() {
-  const [language] = useState<Language>("en");
+function ChatPageContent({ language }: { language: Language }) {
   const t = useTranslation(language);
   const [messages, setMessages] = useState<Message[]>([]);
   const [agent, setAgent] = useState<AgentProfile | null>(null);
@@ -229,5 +228,22 @@ export default function ChatPage() {
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+export default function ChatPage() {
+  const [language] = useState<Language>("en");
+  const t = useTranslation(language);
+
+  return (
+    <Suspense
+      fallback={
+        <div className="p-4" role="status" aria-live="polite">
+          <p>{t.loadingChat}</p>
+        </div>
+      }
+    >
+      <ChatPageContent language={language} />
+    </Suspense>
   );
 }

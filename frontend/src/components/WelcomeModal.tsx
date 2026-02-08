@@ -22,18 +22,19 @@ export default function WelcomeModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gradient-to-br from-blue-500 to-purple-600">
       <div className="bg-white rounded-3xl max-w-xl w-full shadow-2xl overflow-hidden">
         {step === 1 && (
-          <div className="p-8 text-center">
-            {/* Welcome Animation */}
-            <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center animate-float">
-              <span className="text-6xl">🌟</span>
-            </div>
+          <>
+            <div className="p-8 text-center">
+              {/* Welcome Animation */}
+              <div className="w-32 h-32 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center animate-float">
+                <span className="text-6xl">🌟</span>
+              </div>
 
-            <h1 className="text-elderly-2xl font-bold text-slate-800 mb-4">
-              {t.welcomeTitle}
-            </h1>
-            <p className="text-elderly-lg text-slate-600 mb-6 leading-relaxed">
-              {t.welcomeSubtitle}
-            </p>
+              <h1 className="text-elderly-2xl font-bold text-slate-800 mb-4">
+                {t.welcomeTitle}
+              </h1>
+              <p className="text-elderly-lg text-slate-600 mb-6 leading-relaxed">
+                {t.welcomeSubtitle}
+              </p>
 
               <div className="flex items-center justify-center gap-2 mb-3">
                 <Globe className="w-5 h-5 text-slate-600" />
@@ -85,7 +86,7 @@ export default function WelcomeModal({
             >
               {t.getStarted}
             </button>
-          </div>
+          </>
         )}
 
         {step === 2 && (

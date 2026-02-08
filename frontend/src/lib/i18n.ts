@@ -26,12 +26,21 @@ export interface Translations {
   clickToStop: string;
   speakClearly: string;
   keepMicClose: string;
+   micAccessDenied: string;
+   browserNotSupported: string;
+   stopRecording: string;
+   startSpeaking: string;
+   recordingLabel: string;
+   pressToSpeak: string;
+   pressToStop: string;
+   stayStillHint: string;
 
   // Chat
   chatTitle: string;
   chatSubtitle: string;
   inputPlaceholder: string;
   sendButton: string;
+  loadingChat: string;
   emptyStateGreeting: string;
   emptyStateMessage: string;
 
@@ -54,6 +63,7 @@ export interface Translations {
   sosHelpText: string;
   sosEmergency: string;
   sosResponse: string;
+  seconds: string;
 
   // Settings
   settingsTitle: string;
@@ -145,6 +155,9 @@ export interface Translations {
   presetNurseDesc: string;
   defaultRelationship: string;
   playingSample: string;
+  mockFact1?: string;
+  mockFact2?: string;
+  mockFact3?: string;
 
   // Memory Lane
   memoryLaneTitle: string;
@@ -299,6 +312,7 @@ export const translations: Record<Language, Translations> = {
     chatSubtitle: "Aura is always here to listen and chat with {{userName}}",
     inputPlaceholder: "Type your message...",
     sendButton: "Send",
+    loadingChat: "Loading chat...",
     emptyStateGreeting: "👋",
     emptyStateMessage: 'Say "Hello" to start chatting!',
 
@@ -447,6 +461,9 @@ export const translations: Record<Language, Translations> = {
     defaultRelationship:
       "Aura is your daughter, working far away and chatting with you every evening",
     playingSample: "🔊 Playing voice sample...",
+    mockFact1: "Loves gardening",
+    mockFact2: "Enjoys morning tea",
+    mockFact3: "Has a grandson named Minh",
 
     // Memory Lane
     memoryLaneTitle: "Memory Lane",
@@ -574,6 +591,7 @@ export const translations: Record<Language, Translations> = {
     chatSubtitle: "Aura luôn lắng nghe và đồng hành cùng {{userName}}",
     inputPlaceholder: "Nhập tin nhắn của bạn...",
     sendButton: "Gửi",
+    loadingChat: "Đang tải cuộc trò chuyện...",
     emptyStateGreeting: "👋",
     emptyStateMessage: 'Hãy nói "Xin chào" để bắt đầu trò chuyện!',
 
@@ -725,6 +743,9 @@ export const translations: Record<Language, Translations> = {
     defaultRelationship:
       "Aura là con gái của bà, đang đi làm xa và trò chuyện với bà mỗi tối",
     playingSample: "🔊 Đang phát mẫu giọng nói...",
+    mockFact1: "Thích chăm sóc vườn",
+    mockFact2: "Thưởng trà buổi sáng",
+    mockFact3: "Có cháu trai tên Minh",
 
     // Memory Lane
     memoryLaneTitle: "Nhật Ký Kỷ Niệm",

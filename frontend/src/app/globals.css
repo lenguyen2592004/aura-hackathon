@@ -4,9 +4,6 @@
 @tailwind utilities;
 /* stylelint-enable */
 
-/* ========== GOOGLE FONTS IMPORT ========== */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lexend:wght@300;400;500;600;700&display=swap");
-
 /* ========== CSS CUSTOM PROPERTIES ========== */
 :root {
   /* Warm & Minimalist Color Palette */

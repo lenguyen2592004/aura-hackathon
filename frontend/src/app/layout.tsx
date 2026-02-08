@@ -1,20 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Lexend } from "next/font/google";
 import "./globals.css";
-
-// Inter for body text - optimized for readability
-const inter = Inter({
-  subsets: ["latin", "vietnamese"],
-  display: "swap",
-  variable: "--font-inter",
-});
-
-// Lexend for display/headings - designed for reading ease
-const lexend = Lexend({
-  subsets: ["latin", "vietnamese"],
-  display: "swap",
-  variable: "--font-lexend",
-});
 
 export const metadata: Metadata = {
   title: "AURA - Your AI Companion",
@@ -45,7 +30,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${lexend.variable}`}>
+    <html lang="en">
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
       </head>
@@ -53,4 +38,3 @@ export default function RootLayout({
     </html>
   );
 }
-

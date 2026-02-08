@@ -38,7 +38,7 @@ export interface SOSButtonProps {
 
 export interface VoiceButtonProps {
   onVoiceStart: () => void;
-  onVoiceEnd: (transcript: string) => void;
+  onVoiceEnd: (transcriptOrAudio: Blob | string) => void;
   onTranscript: (transcript: string) => void;
   isListening: boolean;
   disabled?: boolean;
