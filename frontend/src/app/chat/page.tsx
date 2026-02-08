@@ -232,7 +232,7 @@ function ChatPageContent({ language }: { language: Language }) {
 }
 
 export default function ChatPage() {
-  const language: Language = "en";
+  const [language] = useState<Language>("en");
   const t = useTranslation(language);
 
   return (
