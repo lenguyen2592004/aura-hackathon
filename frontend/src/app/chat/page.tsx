@@ -26,8 +26,7 @@ interface Message {
   timestamp: Date;
 }
 
-function ChatPageContent() {
-  const [language] = useState<Language>("en");
+function ChatPageContent({ language }: { language: Language }) {
   const t = useTranslation(language);
   const [messages, setMessages] = useState<Message[]>([]);
   const [agent, setAgent] = useState<AgentProfile | null>(null);
@@ -233,9 +232,18 @@ function ChatPageContent() {
 }
 
 export default function ChatPage() {
+  const language: Language = "en";
+  const t = useTranslation(language);
+
   return (
-    <Suspense fallback={<div className="p-4">Loading chat...</div>}>
-      <ChatPageContent />
+    <Suspense
+      fallback={
+        <div className="p-4" role="status" aria-live="polite">
+          <p>{t.loadingChat}</p>
+        </div>
+      }
+    >
+      <ChatPageContent language={language} />
     </Suspense>
   );
 }

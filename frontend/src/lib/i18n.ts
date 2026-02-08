@@ -26,12 +26,21 @@ export interface Translations {
   clickToStop: string;
   speakClearly: string;
   keepMicClose: string;
+   micAccessDenied: string;
+   browserNotSupported: string;
+   stopRecording: string;
+   startSpeaking: string;
+   recordingLabel: string;
+   pressToSpeak: string;
+   pressToStop: string;
+   stayStillHint: string;
 
   // Chat
   chatTitle: string;
   chatSubtitle: string;
   inputPlaceholder: string;
   sendButton: string;
+  loadingChat: string;
   emptyStateGreeting: string;
   emptyStateMessage: string;
 
@@ -260,7 +269,6 @@ export interface Translations {
   mockTopic3: string;
   mockTopic4: string;
   mockTopic5: string;
-  [key: string]: string | undefined;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -304,6 +312,7 @@ export const translations: Record<Language, Translations> = {
     chatSubtitle: "Aura is always here to listen and chat with {{userName}}",
     inputPlaceholder: "Type your message...",
     sendButton: "Send",
+    loadingChat: "Loading chat...",
     emptyStateGreeting: "👋",
     emptyStateMessage: 'Say "Hello" to start chatting!',
 
@@ -582,6 +591,7 @@ export const translations: Record<Language, Translations> = {
     chatSubtitle: "Aura luôn lắng nghe và đồng hành cùng {{userName}}",
     inputPlaceholder: "Nhập tin nhắn của bạn...",
     sendButton: "Gửi",
+    loadingChat: "Đang tải cuộc trò chuyện...",
     emptyStateGreeting: "👋",
     emptyStateMessage: 'Hãy nói "Xin chào" để bắt đầu trò chuyện!',
 
