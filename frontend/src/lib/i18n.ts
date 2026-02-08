@@ -54,6 +54,7 @@ export interface Translations {
   sosHelpText: string;
   sosEmergency: string;
   sosResponse: string;
+  seconds: string;
 
   // Settings
   settingsTitle: string;
@@ -145,6 +146,9 @@ export interface Translations {
   presetNurseDesc: string;
   defaultRelationship: string;
   playingSample: string;
+  mockFact1?: string;
+  mockFact2?: string;
+  mockFact3?: string;
 
   // Memory Lane
   memoryLaneTitle: string;
@@ -256,6 +260,7 @@ export interface Translations {
   mockTopic3: string;
   mockTopic4: string;
   mockTopic5: string;
+  [key: string]: string | undefined;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -447,6 +452,9 @@ export const translations: Record<Language, Translations> = {
     defaultRelationship:
       "Aura is your daughter, working far away and chatting with you every evening",
     playingSample: "🔊 Playing voice sample...",
+    mockFact1: "Loves gardening",
+    mockFact2: "Enjoys morning tea",
+    mockFact3: "Has a grandson named Minh",
 
     // Memory Lane
     memoryLaneTitle: "Memory Lane",
@@ -725,6 +733,9 @@ export const translations: Record<Language, Translations> = {
     defaultRelationship:
       "Aura là con gái của bà, đang đi làm xa và trò chuyện với bà mỗi tối",
     playingSample: "🔊 Đang phát mẫu giọng nói...",
+    mockFact1: "Thích chăm sóc vườn",
+    mockFact2: "Thưởng trà buổi sáng",
+    mockFact3: "Có cháu trai tên Minh",
 
     // Memory Lane
     memoryLaneTitle: "Nhật Ký Kỷ Niệm",
