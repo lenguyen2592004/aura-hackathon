@@ -25,6 +25,7 @@ export default function CreateAgentForm() {
     name: "",
     description: "",
     system_prompt: "",
+    gender: "female",
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -240,6 +241,39 @@ Communication rules:
                     onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                     placeholder={t.auraDescPlaceholder}
                   />
+                </div>
+
+                <div>
+                  <label className="block text-elderly-base font-medium text-navy-700 mb-2">
+                    Voice Gender
+                  </label>
+                  <div className="flex gap-4">
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, gender: "female" })}
+                      className={`flex-1 px-5 py-4 text-elderly-base border-2 rounded-warm-xl transition-all ${
+                        formData.gender === "female"
+                          ? "border-sage-400 bg-sage-50 text-sage-700 font-semibold"
+                          : "border-warmGray-200 bg-white text-warmGray-600 hover:border-warmGray-300"
+                      }`}
+                    >
+                      👩 Female
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setFormData({ ...formData, gender: "male" })}
+                      className={`flex-1 px-5 py-4 text-elderly-base border-2 rounded-warm-xl transition-all ${
+                        formData.gender === "male"
+                          ? "border-sage-400 bg-sage-50 text-sage-700 font-semibold"
+                          : "border-warmGray-200 bg-white text-warmGray-600 hover:border-warmGray-300"
+                      }`}
+                    >
+                      👨 Male
+                    </button>
+                  </div>
+                  <p className="text-elderly-sm text-warmGray-500 mt-2">
+                    Voice will be automatically assigned based on gender
+                  </p>
                 </div>
               </div>
             </div>

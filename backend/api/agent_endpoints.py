@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from services.agent_service import agent_service, CreateAgentRequest, UpdateAgentRequest, AgentProfile
+from constants.voices import VOICE_LIST, AVAILABLE_GEMINI_VOICES, MALE_VOICES, FEMALE_VOICES
 from typing import List
 
 router = APIRouter()
@@ -32,3 +33,12 @@ async def delete_agent(agent_id: str):
     if not success:
         raise HTTPException(status_code=404, detail="Agent not found")
     return {"message": "Agent deleted successfully"}
+
+@router.get("/voices/list")
+async def list_voices():
+    return {
+        "voices": VOICE_LIST,
+        "gemini_voices": AVAILABLE_GEMINI_VOICES,
+        "male_voices": MALE_VOICES,
+        "female_voices": FEMALE_VOICES
+    }
