@@ -1,12 +1,18 @@
+import json
+import os
 from pydantic import BaseModel
 from typing import List, Optional, Dict
 import uuid
+from constants.voices import get_random_voice_by_gender
+
+GENDER_OPTIONS = ["male", "female", "neutral"]
 
 class AgentProfile(BaseModel):
     id: str
     name: str
     description: str
     system_prompt: str
+    gender: Optional[str] = None
     voice_id: Optional[str] = None
     avatar_url: Optional[str] = None
 
@@ -14,6 +20,7 @@ class CreateAgentRequest(BaseModel):
     name: str
     description: str
     system_prompt: str
+    gender: Optional[str] = None
     voice_id: Optional[str] = None
     avatar_url: Optional[str] = None
 
@@ -21,11 +28,9 @@ class UpdateAgentRequest(BaseModel):
     name: Optional[str] = None
     description: Optional[str] = None
     system_prompt: Optional[str] = None
+    gender: Optional[str] = None
     voice_id: Optional[str] = None
     avatar_url: Optional[str] = None
-
-import json
-import os
 
 class AgentService:
     def __init__(self):
@@ -47,14 +52,21 @@ class AgentService:
 
     def create_agent(self, request: CreateAgentRequest) -> AgentProfile:
         agent_id = str(uuid.uuid4())
+        
+        voice_id = request.voice_id
+        if not voice_id and request.gender:
+            voice_id = get_random_voice_by_gender(request.gender)
+        
         agent = AgentProfile(
             id=agent_id,
             name=request.name,
             description=request.description,
             system_prompt=request.system_prompt,
-            voice_id=request.voice_id
+            voice_id=voice_id,
+            gender=request.gender
         )
         self.agents[agent_id] = agent
+        print(f"Created agent '{agent.name}' with voice_id: {voice_id}")
         return agent
 
     def get_agent(self, agent_id: str) -> Optional[AgentProfile]:
