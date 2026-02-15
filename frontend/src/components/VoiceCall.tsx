@@ -71,10 +71,17 @@ export default function VoiceCall({ onClose, agentName, agentId }: VoiceCallProp
       }
   };
 
-  const sendAudio = (blob: Blob) => {
+  const sendAudio = async (blob: Blob) => {
       if (wsRef.current?.readyState === WebSocket.OPEN) {
-          wsRef.current.send(blob); 
-          console.log("Sent audio blob:", blob.size, "bytes");
+          const reader = new FileReader();
+          reader.onloadend = () => {
+              const base64 = (reader.result as string).split(',')[1];
+              wsRef.current?.send(JSON.stringify({
+                  audio_data: base64
+              }));
+              console.log("Sent audio data:", blob.size, "bytes");
+          };
+          reader.readAsDataURL(blob);
       }
   };
 
@@ -137,19 +144,27 @@ export default function VoiceCall({ onClose, agentName, agentId }: VoiceCallProp
         try {
             const data = JSON.parse(event.data);
             
-            if (data.type === "transcript") {
+            if (data.status === "processing") {
+                console.log(data.msg);
+                if (data.step === 1) {
+                    setStatus("processing");
+                }
+            } else if (data.type === "transcript") {
                 setTranscript(data.content);
-                setStatus("processing");
-            } else if (data.type === "llm_response") {
-                // LLM text response
-            } else if (data.type === "audio") {
+            } else if (data.status === "complete" && data.audio) {
+                if (data.text) {
+                    setTranscript(data.text);
+                }
                 if (!isSpeakerOff) {
                     setStatus("speaking");
-                    await playAudio(data.content);
+                    await playAudio(data.audio);
                     setStatus("idle");
                 } else {
                     setStatus("idle");
                 }
+            } else if (data.status === "error") {
+                console.error("Error from server:", data.msg);
+                setStatus("idle");
             }
         } catch (e) {
             console.error("Error parsing WS message", e);
