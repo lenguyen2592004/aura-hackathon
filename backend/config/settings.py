@@ -12,7 +12,7 @@ class Settings:
     
     GOOGLE_API_KEY: str = os.getenv("GOOGLE_API_KEY", "")
     BRAIN_MODEL: str = os.getenv("BRAIN_MODEL", "gemini-2.0-flash")
-    VOICE_MODEL: str = os.getenv("VOICE_MODEL", "gemini-2.0-flash-preview-tts")
+    VOICE_MODEL: str = os.getenv("VOICE_MODEL", "gemini-2.5-flash-preview-tts")
     DEFAULT_VOICE: str = os.getenv("DEFAULT_VOICE", "Kore")
     
 settings = Settings()

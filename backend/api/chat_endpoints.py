@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Form, HTTPException
+from fastapi import APIRouter, UploadFile, File, Response
 from typing import Optional
 import base64
 from services.agent_service import agent_service
@@ -9,11 +9,17 @@ from services.history_service import history_service
 
 router = APIRouter()
 
-@router.post("/chat", response_model=dict)
-async def chat_text(payload: dict):
+from pydantic import BaseModel
 
-    user_text = payload.get("text", "")
-    agent_id = payload.get("agent_id")
+class ChatRequest(BaseModel):
+    text: str
+    agent_id: Optional[str] = None
+
+@router.post("/chat", response_model=dict)
+async def chat_text(request: ChatRequest):
+
+    user_text = request.text
+    agent_id = request.agent_id
     
     if not user_text:
         return {"response": "No text provided"}
@@ -29,7 +35,7 @@ async def chat_text(payload: dict):
     
     return {"response": response_text}
 
-@router.get("/history/{agent_id}")
+@router.get("/chat/history/{agent_id}")
 async def get_chat_history(agent_id: str):
 
     return history_service.get_history(agent_id)
@@ -52,8 +58,11 @@ async def talk_to_aura(file: UploadFile = File(...)):
     # 4. TTS
     audio_output = await tts_service.speak(response_text)
     
-    return {
-        "user_text": transcript,
-        "ai_response": response_text,
-        "audio_base64": base64.b64encode(audio_output).decode('utf-8')
+    import urllib.parse
+    headers = {
+        "X-User-Transcript": urllib.parse.quote(transcript),
+        "X-AI-Response": urllib.parse.quote(response_text),
+        "Content-Disposition": "attachment; filename=response.wav"
     }
+    
+    return Response(content=audio_output, media_type="audio/wav", headers=headers)

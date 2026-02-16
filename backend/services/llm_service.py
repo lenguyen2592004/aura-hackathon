@@ -1,7 +1,7 @@
 import asyncio
 from google import genai
 from services.agent_service import AgentProfile
-from backend.services.prompts.system_prompts import DEFAULT_SYSTEM_PROMPT, LLM_AGENT_PROMPT_TEMPLATE
+from services.prompts.system_prompts import DEFAULT_SYSTEM_PROMPT, LLM_AGENT_PROMPT_TEMPLATE
 from config.settings import settings
 
 class LLMService:

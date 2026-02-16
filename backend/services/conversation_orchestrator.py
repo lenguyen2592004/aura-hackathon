@@ -75,8 +75,21 @@ class ConversationOrchestrator:
         if response.candidates and response.candidates[0].content.parts:
             part = response.candidates[0].content.parts[0]
             if part.inline_data:
-                return base64.b64encode(part.inline_data.data).decode('utf-8')
+                audio_data = part.inline_data.data
+                print(f"Generated audio data length: {len(audio_data)} bytes")
+                if len(audio_data) > 0:
+                    try:
+                        with open("output.mp3", "wb") as f:
+                            f.write(audio_data)
+                        print("Saved audio to output.mp3")
+                    except Exception as e:
+                        print(f"Failed to save output.mp3: {e}")
+                    
+                    sample = audio_data[:10]
+                    print(f"Audio sample (first 10 bytes): {sample.hex()}")
+                return base64.b64encode(audio_data).decode('utf-8')
         
+        print("Model did not return audio inline_data")
         return None
 
     async def process_gemini_audio_flow(
@@ -86,43 +99,52 @@ class ConversationOrchestrator:
     ) -> AsyncGenerator[Dict[str, Any], None]:
         yield {"status": "processing", "step": 1, "msg": "🧠 Brain: Thinking..."}
         
-        system_instruction = self.build_system_instruction(agent)
-        text_response = await self.process_audio_to_text(audio_bytes, system_instruction)
-        
-        print(f"Brain Output: {text_response}")
-        
+        # 1. STT
+        transcript = await stt_service.transcribe(audio_bytes)
+        if not transcript:
+            yield {"status": "error", "msg": "Could not understand audio"}
+            return
+
         yield {
             "type": "transcript",
-            "content": text_response
+            "content": transcript
         }
+        
+        # 2. RAG
+        response_text = await rag_service.chat(transcript, agent=agent)
+        
+        print(f"Brain Output: {response_text}")
         
         yield {"status": "processing", "step": 2, "msg": "🗣️ Voice: Generating audio..."}
         
-        voice_name = self.get_voice_for_agent(agent)
-        audio_b64 = await self.generate_audio_response(text_response, voice_name)
+        # 3. TTS
+        voice_id = agent.voice_id if agent else None
+        audio_output = await tts_service.speak(response_text, voice_id)
         
-        if audio_b64:
+        if audio_output:
+            audio_b64 = base64.b64encode(audio_output).decode('utf-8')
             yield {
                 "status": "complete",
                 "type": "audio",
-                "text": text_response,
+                "text": response_text,
                 "audio": audio_b64
             }
         else:
             yield {"status": "error", "msg": "Model did not return audio."}
 
-    async def process_text_flow(self, text: str, agent: AgentProfile) -> AsyncGenerator[Dict[str, Any], None]:
+    async def process_text_flow(self, text: str, agent: Optional[AgentProfile]) -> AsyncGenerator[Dict[str, Any], None]:
         response_text = await rag_service.chat(text, agent=agent)
         
-        history_service.save_message(agent.id, "user", text)
-        history_service.save_message(agent.id, "assistant", response_text)
+        agent_id = agent.id if agent else "default"
+        history_service.save_message(agent_id, "user", text)
+        history_service.save_message(agent_id, "assistant", response_text)
         
         yield {
             "type": "llm_response",
             "content": response_text
         }
 
-    async def process_audio_flow(self, audio_data: bytes, agent: AgentProfile) -> AsyncGenerator[Dict[str, Any], None]:
+    async def process_audio_flow(self, audio_data: bytes, agent: Optional[AgentProfile]) -> AsyncGenerator[Dict[str, Any], None]:
         transcript = await stt_service.transcribe(audio_data)
         yield {
             "type": "transcript",
@@ -134,8 +156,9 @@ class ConversationOrchestrator:
 
         response_text = await rag_service.chat(transcript, agent=agent)
         
-        history_service.save_message(agent.id, "user", transcript)
-        history_service.save_message(agent.id, "assistant", response_text)
+        agent_id = agent.id if agent else "default"
+        history_service.save_message(agent_id, "user", transcript)
+        history_service.save_message(agent_id, "assistant", response_text)
         
         yield {
             "type": "llm_response",

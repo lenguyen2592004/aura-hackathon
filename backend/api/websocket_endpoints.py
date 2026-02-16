@@ -22,13 +22,16 @@ async def websocket_endpoint(websocket: WebSocket, agent_id: str = Query(None)):
             data = await websocket.receive_text()
             message = json.loads(data)
             
-            if "audio_data" not in message:
-                continue
-
-            audio_bytes = base64.b64decode(message["audio_data"])
+            if "audio_data" in message:
+                audio_bytes = base64.b64decode(message["audio_data"])
+                async for response in conversation_orchestrator.process_gemini_audio_flow(audio_bytes, current_agent):
+                    await websocket.send_json(response)
             
-            async for response in conversation_orchestrator.process_gemini_audio_flow(audio_bytes, current_agent):
-                await websocket.send_json(response)
+            elif message.get("type") == "text_message" or "text" in message:
+                text_content = message.get("content") or message.get("text")
+                if text_content:
+                    async for response in conversation_orchestrator.process_text_flow(text_content, current_agent):
+                        await websocket.send_json(response)
 
     except WebSocketDisconnect:
         print("WS Disconnected")
