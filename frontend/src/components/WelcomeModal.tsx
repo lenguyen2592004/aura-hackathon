@@ -69,7 +69,6 @@ export default function WelcomeModal({
                   🇻🇳 Tiếng Việt
                 </button>
               </div>
-            </div>
 
             <button
               onClick={() => setStep(2)}
